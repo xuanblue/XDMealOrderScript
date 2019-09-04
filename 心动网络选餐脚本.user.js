@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         心动网络选餐插件
+// @name         心动网络选餐脚本
 // @namespace    http://www.xd.com/
-// @version      1.0.0
-// @description  轻松智能选餐。由https://greasyfork.org/zh-CN/scripts/372414-%E9%80%89%E9%A5%AD加工丰富而来。
+// @version      1.0.0.1
+// @description  便捷个性化辅助选餐；保存选餐结果。由https://greasyfork.org/zh-CN/scripts/372414-%E9%80%89%E9%A5%AD加工丰富而来。
 // @author       xuanblue
 // @contribution xiedi
 // @match        https://wj.qq.com/*
@@ -46,13 +46,15 @@ function addFavors(position) {
     favorsDiv.append('<b><label for="favors" style="font-size:18px">喜好列表, 用"；"隔开：</label></b>');
     favorsDiv.append('&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ');
     favorsDiv.append('<input id="useRegex" type="checkbox" style="font-size:18px; width:16px; height:16px;">&nbsp; <b>使用正则</b></input>');
+    favorsDiv.append('<a target="_blank" href="https://www.runoob.com/regexp/regexp-syntax.html">（语法帮助）</a>');
+    favorsDiv.append('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input id="jumpToSubmit" type="checkbox" style="font-size:18px; width:16px; height:16px;">&nbsp; <b>选完跳转到提交按钮</b></input>');
     favorsDiv.append('<input id="favors" type="text" class="inputs-input">');
     favorsDiv.append('<br/><br/>');
 
-    var useRegex = localStorage.getItem("useRegex");
-    if (useRegex == "checked") {
-        $("#useRegex").prop("checked", true);
-    }
+    var useRegex = localStorage.getItem("useRegex") == "true";
+    $("#useRegex").prop("checked", useRegex);
+    var jumpToSubmit = localStorage.getItem("jumpToSubmit") == "true";
+    $("#jumpToSubmit").prop("checked", jumpToSubmit);
 
     var favorsConent = localStorage.getItem("favors");
     if (favorsConent != null) {
@@ -60,15 +62,22 @@ function addFavors(position) {
     }
 
     var save_btn = createBtn("保存喜好", "btn btn-event", function() {
-        localStorage.setItem("favors", $("#favors").val());
+        saveFavors();
         alert("喜好列表保存成功");
     });
     var favors_btn = createBtn("一键喜好", "btn btn-event", function() {
-        localStorage.setItem("favors", $("#favors").val());
+        saveFavors();
         autoselectFavors();
     });
     position.before(save_btn);
     position.before(favors_btn);
+}
+
+function saveFavors() {
+    var $ = window.$;
+    localStorage.setItem("favors", $("#favors").val());
+    localStorage.setItem("useRegex", $("#useRegex").prop("checked"));
+    localStorage.setItem("jumpToSubmit", $("#jumpToSubmit").prop("checked"));
 }
 
 function autoselectFavors() {
@@ -88,7 +97,7 @@ function addOneKeyBtns(position) {
     });
     position.before(buffet_btn);
 
-    var noeat_btn = createBtn("一键不吃", "btn btn-event", function() {
+    var noeat_btn = createBtn("一键修仙", "btn btn-event", function() {
         oneKeySelect("不吃");
     });
     position.before(noeat_btn);
@@ -112,7 +121,10 @@ function oneKeySelect(content) {
             }
         }
     }
-    window.scrollTo(0, document.querySelector(".survey-container").scrollHeight);
+    var jumpToSubmit = $("#jumpToSubmit").prop("checked");
+    if (jumpToSubmit) {
+        window.scrollTo(0, document.querySelector(".survey-container").scrollHeight);
+    }
 }
 
 function selectUsername() {
