@@ -22,10 +22,10 @@
 ![](./images/Tampermonkey.png)
 
 2、安装启用本脚本。
-* [点击从OpenUserJS脚本库安装](https://openuserjs.org/scripts/xuanblue/%E5%BF%83%E5%8A%A8%E7%BD%91%E7%BB%9C%E9%80%89%E9%A4%90%E6%8F%92%E4%BB%B6)（推荐）
+* [点击从OpenUserJS脚本库安装](https://openuserjs.org/scripts/xuanblue/%E5%BF%83%E5%8A%A8%E7%BD%91%E7%BB%9C%E9%80%89%E9%A4%90%E8%84%9A%E6%9C%AC)（推荐）
 
 ![](./images/openUserJS.png)
-* [直接从此库下载](https://github.com/xuanblue/XDMealOrderScript/blob/master/%E5%BF%83%E5%8A%A8%E7%BD%91%E7%BB%9C%E9%80%89%E9%A4%90%E6%8F%92%E4%BB%B6.user.js)，手动安装
+* [直接从此库下载](./心动网络选餐脚本.user.js)，手动安装
 
 3、用安装好脚本的浏览器打开每周订餐问卷页面，脚本会自动识别，添加扩展功能
 ![](./images/extension.png)
