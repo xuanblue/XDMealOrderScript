@@ -13,6 +13,7 @@
 window.$('head').append('<style type="text/css">.btn-event {  display: inline-block;  width: 85px;  line-height: 34px;  padding: 0 10px;  margin: 0 10px;  text-align: center;  border-radius: 3px;  background-color: #018fff;  color: #fff;  cursor: pointer; }')
 window.$('head').append('<style type="text/css">.btn-event:hover { background-color: #008FFF; }')
 window.$('head').append('<style type="text/css">.btn-export { line-height: 40px; }')
+window.$('head').append('<style type="text/css">.notSelected { font-size: 18px; color: rgba(255,0,0,1); }')
 
 window.addEventListener('load', function () {
     if (!checkIsOrderingToInit()) {
@@ -68,6 +69,7 @@ function addFavors(position) {
     var favors_btn = createBtn("一键喜好", "btn btn-event", function() {
         saveFavors();
         autoselectFavors();
+        getSelectedResult();
     });
     position.before(save_btn);
     position.before(favors_btn);
@@ -94,11 +96,13 @@ function autoselectFavors() {
 function addOneKeyBtns(position) {
     var buffet_btn = createBtn("一键自助", "btn btn-event", function() {
         oneKeySelect("自助餐");
+        getSelectedResult();
     });
     position.before(buffet_btn);
 
     var noeat_btn = createBtn("一键修仙", "btn btn-event", function() {
         oneKeySelect("不吃");
+        getSelectedResult();
     });
     position.before(noeat_btn);
 }
@@ -186,6 +190,10 @@ function setSelectedTag() {
                 label.onclick = function(body, index) {
                     return function() {
                         body.setAttribute("selected-index", index);
+                        var notSelected = question.querySelector(".notSelected");
+                        if (notSelected != null) {
+                            window.$(notSelected).remove();
+                        }
                     }
                 }(questionBody, i);
             }
@@ -210,9 +218,17 @@ function getSelectedResult() {
             var foodInfo = getFoodInfoFromTitle(title);
             var questionBody = question.querySelector(".question-body");
             var index = parseInt(questionBody.getAttribute("selected-index"));
-            var option_items = questionBody.querySelectorAll(".checkbox-option");
-            var option_item = option_items[index];
-            foodInfo.content = option_item.textContent.trim();
+            if (isNaN(index)) {
+                var notSelected = question.querySelector(".notSelected");
+                if (notSelected == null) {
+                    window.$(question).prepend('<a class="notSelected"><b>-----------尚 未 选 择-----------</b></a>');
+                }
+                continue;
+            } else {
+                var option_items = questionBody.querySelectorAll(".checkbox-option");
+                var option_item = option_items[index];
+                foodInfo.content = option_item.textContent.trim();
+            }
             if (foodInfo.content.includes("不吃")) {
                 foodInfo.not_eat = true;
             }
@@ -304,16 +320,19 @@ function showTxtResult(result) {
     }
     showValue += result.username + newline;
 
+    var day = "";
     result.foods.forEach(function(food) {
         if (0 == food.am) {
+            day = food.day;
             showValue += food.year + "年" + food.month + "月" + food.day + "日" + newline + "午餐：" + food.content + newline;
         } else {
+            if (food.day != day) {
+                showValue += food.year + "年" + food.month + "月" + food.day + "日" + newline;
+            }
             showValue += "晚餐：" + food.content + newline;
         }
     });
-
     console.log(showValue);
-
     return showValue;
 }
 
