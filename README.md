@@ -35,6 +35,15 @@
 
 ![](./images/export.png)
 
+### 安装日历
+1、选择“开始” 按钮，键入“Microsoft Store”
+
+2、在“Microsoft Store”中搜索“日历”，点击安装（推荐微软官方出品“邮件和日历”）
+![](./images/calendar.png)
+
+3、双击本脚本导出的“.ics”日历文件，即可导入日历软件，收到餐前提醒
+![](./images/schedule.png)
+
 ### 意见反馈
 欢迎各位使用者提供意见反馈，将不定期更新维护
 
