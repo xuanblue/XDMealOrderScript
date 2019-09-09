@@ -41,16 +41,45 @@ function init() {
 
 function addFavors(position) {
     var $ = window.$;
-    position.before('<div id="favorsDiv">');
+    position.before('<div id="separateDiv">');
+    var separateDiv = $("#separateDiv");
+    separateDiv.append('<input id="separate" type="checkbox" style="font-size:18px; width:16px; height:16px;">&nbsp; <b>午晚餐分离</b></input>');
+    $("#separate").click(function() {
+        var separate = $("#separate").prop("checked");
+        var hasFavorsDinner = $("#favorsDinner").length > 0;
+        if (separate) {
+            if (hasFavorsDinner) {
+                $("#favorsDinner").show();
+            } else {
+                $("#favors").after('<input id="favorsDinner" type="text" class="inputs-input" placeholder="晚餐">');
+                var favorsConent = localStorage.getItem("favorsDinner");
+                if (favorsConent != null) {
+                    $("#favorsDinner").val(favorsConent);
+                }
+            }
+            $("#favors").prop("placeholder", "午餐");
+        } else {
+            if (hasFavorsDinner) {
+                $("#favorsDinner").hide();
+            }
+            $("#favors").prop("placeholder", "午、晚餐");
+        }
+    });
+    separateDiv.append('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input id="jumpToSubmit" type="checkbox" style="font-size:18px; width:16px; height:16px;">&nbsp; <b>选完跳转到提交按钮</b></input>');
 
+    position.before('<div id="favorsDiv">');
     var favorsDiv = $("#favorsDiv");
     favorsDiv.append('<b><label for="favors" style="font-size:18px">喜好列表, 用"；"隔开：</label></b>');
     favorsDiv.append('&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ');
     favorsDiv.append('<input id="useRegex" type="checkbox" style="font-size:18px; width:16px; height:16px;">&nbsp; <b>使用正则</b></input>');
-    favorsDiv.append('<a target="_blank" href="https://www.runoob.com/regexp/regexp-syntax.html">（语法帮助）</a>');
-    favorsDiv.append('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input id="jumpToSubmit" type="checkbox" style="font-size:18px; width:16px; height:16px;">&nbsp; <b>选完跳转到提交按钮</b></input>');
-    favorsDiv.append('<input id="favors" type="text" class="inputs-input">');
+    favorsDiv.append('<a target="_blank" href="https://www.runoob.com/regexp/regexp-syntax.html">（语法帮助）</a>（例：小炒肉.*红采.*；自助餐）');
+    favorsDiv.append('<input id="favors" type="text" class="inputs-input" placeholder="午、晚餐">');
     favorsDiv.append('<br/><br/>');
+
+    var storageSeparate = localStorage.getItem("separate") == "true";
+    if (storageSeparate) {
+        $("#separate").click();
+    }
 
     var useRegex = localStorage.getItem("useRegex") == "true";
     $("#useRegex").prop("checked", useRegex);
@@ -78,6 +107,13 @@ function addFavors(position) {
 function saveFavors() {
     var $ = window.$;
     localStorage.setItem("favors", $("#favors").val());
+    if ($("#favorsDinner") != null) {
+        localStorage.setItem("favorsDinner", $("#favorsDinner").val());
+    } else {
+        localStorage.removeItem("favorsDinner");
+    }
+
+    localStorage.setItem("separate", $("#separate").prop("checked"));
     localStorage.setItem("useRegex", $("#useRegex").prop("checked"));
     localStorage.setItem("jumpToSubmit", $("#jumpToSubmit").prop("checked"));
 }
@@ -85,11 +121,32 @@ function saveFavors() {
 function autoselectFavors() {
     var favorsConent = localStorage.getItem("favors");
     if (favorsConent == null || favorsConent.length == 0) {
+        alert("请填写午饭喜好列表");
         return;
     }
+
+    var separate = window.$("#separate").prop("checked");
     var favors = favorsConent.split('；').reverse();
     for (const favor of favors) {
-        oneKeySelect(favor);
+        if (separate) {
+            oneKeySelect(favor, "午饭");
+        } else {
+            oneKeySelect(favor);
+        }
+    }
+
+    if (!separate) {
+        return;
+    }
+
+    var favorsDinnerConent = localStorage.getItem("favorsDinner");
+    if (favorsDinnerConent == null || favorsDinnerConent.length == 0) {
+        alert("请填写晚饭喜好列表");
+        return;
+    }
+    var favorsDinner = favorsDinnerConent.split('；').reverse();
+    for (const favor of favorsDinner) {
+        oneKeySelect(favor, "晚饭");
     }
 }
 
@@ -107,15 +164,21 @@ function addOneKeyBtns(position) {
     position.before(noeat_btn);
 }
 
-function oneKeySelect(content) {
+function oneKeySelect(content, title) {
     var $ = window.$;
     var useRegex = $("#useRegex").prop("checked");
     var questions = $(".question-list section");
     for (const question of questions) {
         var option_items = question.querySelectorAll(".checkbox-option");
+        if (title !== undefined) {
+            var titleSpan = question.querySelector("strong>span");
+            if (titleSpan == null || titleSpan.innerText.indexOf(title) < 0) {
+                continue;
+            }
+        }
         for (const option_item of option_items) {
             if (useRegex) {
-                if (option_item.textContent.trim().search(content) >= 0) {
+                if (content.trim().length > 0 && option_item.textContent.trim().search(content) >= 0) {
                     option_item.querySelector("label").click();
                     break;
                 }
