@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         心动网络选餐脚本
 // @namespace    https://github.com/xuanblue/XDMealOrderScript
-// @version      1.2.0
+// @version      1.2.1
 // @description  便捷个性化辅助选餐；保存选餐结果。由https://greasyfork.org/zh-CN/scripts/372414-%E9%80%89%E9%A5%AD加工丰富而来。
 // @author       xuanbang
 // @contribution xiedi
 // @match        https://wj.qq.com/*
 // @license      MIT
-// @require      http://code.jquery.com/jquery-3.4.1.min.js
+// @require      https://code.jquery.com/jquery-3.4.1.min.js
 // ==/UserScript==
 
 window.$('head').append('<style type="text/css">.btn-event {  display: inline-block;  width: 85px;  line-height: 34px;  padding: 0 10px;  margin: 0 10px;  text-align: center;  border-radius: 3px;  background-color: #018fff;  color: #fff;  cursor: pointer; }')
