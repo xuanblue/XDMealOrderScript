@@ -8,21 +8,24 @@
 // @match        https://wj.qq.com/*
 // @license      MIT
 // @require      https://code.jquery.com/jquery-3.4.1.min.js
+// @grant        none
 // ==/UserScript==
 
-window.$('head').append('<style type="text/css">.btn-event {  display: inline-block;  width: 85px;  line-height: 34px;  padding: 0 10px;  margin: 0 10px;  text-align: center;  border-radius: 3px;  background-color: #018fff;  color: #fff;  cursor: pointer; }')
-window.$('head').append('<style type="text/css">.btn-event:hover { background-color: #008FFF; }')
-window.$('head').append('<style type="text/css">.btn-export { line-height: 40px; }')
-window.$('head').append('<style type="text/css">.notSelected { font-size: 18px; color: rgba(255,0,0,1); }')
+this.$ = window.$;
+
+$('head').append('<style type="text/css">.btn-event {  display: inline-block;  width: 85px;  line-height: 34px;  padding: 0 10px;  margin: 0 10px;  text-align: center;  border-radius: 3px;  background-color: #018fff;  color: #fff;  cursor: pointer; }');
+$('head').append('<style type="text/css">.btn-event:hover { background-color: #008FFF; }');
+$('head').append('<style type="text/css">.btn-export { line-height: 40px; }');
+$('head').append('<style type="text/css">.notSelected { font-size: 18px; color: rgba(255,0,0,1); }');
 
 window.addEventListener('load', function () {
     if (!checkIsOrderingToInit()) {
         setTimeout(checkIsOrderingToInit, 2000);
     }
-})
+});
 
 function checkIsOrderingToInit() {
-    var title = window.$(".survey-header-title").text();
+    var title = $(".survey-header-title").text();
     if (title.includes("一周选饭")) {
         init();
         return true;
@@ -31,7 +34,7 @@ function checkIsOrderingToInit() {
 }
 
 function init() {
-    var question_list = window.$(".question-list");
+    var question_list = $(".question-list");
     addFavors(question_list);
     addOneKeyBtns(question_list);
     selectUsername();
@@ -40,7 +43,6 @@ function init() {
 }
 
 function addFavors(position) {
-    var $ = window.$;
     position.before('<div id="separateDiv">');
     var separateDiv = $("#separateDiv");
     separateDiv.append('<input id="separate" type="checkbox" style="font-size:18px; width:16px; height:16px;">&nbsp; <b>午晚餐分离</b></input>');
@@ -105,7 +107,6 @@ function addFavors(position) {
 }
 
 function saveFavors() {
-    var $ = window.$;
     localStorage.setItem("favors", $("#favors").val());
     if ($("#favorsDinner") != null) {
         localStorage.setItem("favorsDinner", $("#favorsDinner").val());
@@ -125,7 +126,7 @@ function autoselectFavors() {
         return;
     }
 
-    var separate = window.$("#separate").prop("checked");
+    var separate = $("#separate").prop("checked");
     var favors = favorsConent.split('；').reverse();
     for (const favor of favors) {
         if (separate) {
@@ -165,7 +166,6 @@ function addOneKeyBtns(position) {
 }
 
 function oneKeySelect(content, title) {
-    var $ = window.$;
     var useRegex = $("#useRegex").prop("checked");
     var questions = $(".question-list section");
     for (const question of questions) {
@@ -196,7 +196,7 @@ function oneKeySelect(content, title) {
 
 function selectUsername() {
     var username = localStorage.getItem("username");
-    var users = window.$(".select-list-li");
+    var users = $(".select-list-li");
     for (const user of users) {
         var userText = user.textContent.trim();
         if (userText.startsWith("--")) {
@@ -205,16 +205,15 @@ function selectUsername() {
         user.onclick = function(name) {
             return function() {
                 localStorage.setItem("username", name);
-            }
+            };
         }(userText);
         if (username == userText) {
-            user.click()
+            user.click();
         }
     }
 }
 
 function addExportBtns() {
-    var $ = window.$;
     var title = $(".survey-header-title").text();
     var submit_btn = $(".btn-submit");
 
@@ -236,11 +235,11 @@ function createBtn(title, className, clickFunc) {
     button.className = className;
     button.textContent = title;
     button.onclick = clickFunc;
-    return button
+    return button;
 }
 
 function setSelectedTag() {
-    var questions = window.$(".question-list section");
+    var questions = $(".question-list section");
     for (const question of questions) {
         if (question.querySelector(".selectbox") != null) {
             continue;
@@ -255,9 +254,9 @@ function setSelectedTag() {
                         body.setAttribute("selected-index", index);
                         var notSelected = question.querySelector(".notSelected");
                         if (notSelected != null) {
-                            window.$(notSelected).remove();
+                            $(notSelected).remove();
                         }
-                    }
+                    };
                 }(questionBody, i);
             }
         }
@@ -267,7 +266,7 @@ function setSelectedTag() {
 function getSelectedResult() {
     var result = {
         username: "",
-        foods: new Array()
+        foods: []
     };
     var questions = document.querySelector('.question-list').querySelectorAll("section");
     for (const question of questions) {
@@ -284,7 +283,7 @@ function getSelectedResult() {
             if (isNaN(index)) {
                 var notSelected = question.querySelector(".notSelected");
                 if (notSelected == null) {
-                    window.$(question).prepend('<a class="notSelected"><b>-----------尚 未 选 择-----------</b></a>');
+                    $(question).prepend('<a class="notSelected"><b>-----------尚 未 选 择-----------</b></a>');
                 }
                 continue;
             } else {
@@ -301,27 +300,27 @@ function getSelectedResult() {
 
     result.foods.sort(function(a, b) {
         if (a.year < b.year) {
-            return -1
+            return -1;
         } else if (a.year > b.year) {
-            return 1
+            return 1;
         }
 
         if (a.month < b.month) {
-            return -1
+            return -1;
         } else if (a.month > b.month) {
-            return 1
+            return 1;
         }
 
         if (a.day < b.day) {
-            return -1
+            return -1;
         } else if (a.day > b.day) {
-            return 1
+            return 1;
         }
 
         if (a.am < b.am) {
-            return -1
+            return -1;
         } else if (a.am > b.am) {
-            return 1
+            return 1;
         }
 
         return 0;
@@ -346,7 +345,7 @@ function getFoodInfoFromTitle(title) {
     foodInfo.year = now.getFullYear();
     if ((11 == now.getMonth()) && (1 == foodInfo.month)) {
         // 进入第二年
-        foodInfo.year += 1
+        foodInfo.year += 1;
     }
     if (title.includes("晚")) {
         foodInfo.am = 1;
@@ -359,10 +358,10 @@ function getNumberByStr(str) {
     var num = 0;
     var char;
     if (str.length > 0) {
-        num += charToNum(str[str.length - 1], 1)
+        num += charToNum(str[str.length - 1], 1);
     }
     if (str.length > 1) {
-        num += charToNum(str[str.length - 2], 10)
+        num += charToNum(str[str.length - 2], 10);
     }
     return num;
 }
@@ -425,7 +424,7 @@ function createIcsEvent(food) {
     foodTime.setFullYear(food.year);
     foodTime.setMonth(food.month - 1);
     foodTime.setDate(food.day);
-//     var reg = /（([^）]+)）/;
+    //     var reg = /（([^）]+)）/;
     var reg = /（([^）]+)）([^（]+)(.*)/;
     var regResult = reg.exec(food.content);
     var short = "";
