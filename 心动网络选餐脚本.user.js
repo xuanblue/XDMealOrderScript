@@ -17,6 +17,7 @@ $('head').append('<style type="text/css">.btn-event {  display: inline-block;  w
 $('head').append('<style type="text/css">.btn-event:hover { background-color: #008FFF; }');
 $('head').append('<style type="text/css">.btn-export { line-height: 40px; }');
 $('head').append('<style type="text/css">.notSelected { font-size: 18px; color: rgba(255,0,0,1); }');
+$('head').append('<style type="text/css">.input-alarm { margin-top: 9px; width:100px;  box-sizing: border-box; border-radius: 3px; border: 1px solid #cbd5de; }');
 
 window.addEventListener('load', function () {
     if (!checkIsOrderingToInit()) {
@@ -67,7 +68,9 @@ function addFavors(position) {
             $("#favors").prop("placeholder", "午、晚餐");
         }
     });
-    separateDiv.append('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input id="jumpToSubmit" type="checkbox" style="font-size:18px; width:16px; height:16px;">&nbsp; <b>选完跳转到提交按钮</b></input>');
+    separateDiv.append('&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; <input id="jumpToSubmit" type="checkbox" style="font-size:18px; width:16px; height:16px; margin-top: 22px;">&nbsp; <b>选完跳转到提交按钮</b></input>');
+
+    addAlarmSetting(separateDiv);
 
     position.before('<div id="favorsDiv">');
     var favorsDiv = $("#favorsDiv");
@@ -117,6 +120,9 @@ function saveFavors() {
     localStorage.setItem("separate", $("#separate").prop("checked"));
     localStorage.setItem("useRegex", $("#useRegex").prop("checked"));
     localStorage.setItem("jumpToSubmit", $("#jumpToSubmit").prop("checked"));
+
+    localStorage.setItem("lunchAlarm", $("#lunchAlarm").val());
+    localStorage.setItem("dinnerAlarm", $("#dinnerAlarm").val());
 }
 
 function autoselectFavors() {
@@ -236,6 +242,55 @@ function createBtn(title, className, clickFunc) {
     button.textContent = title;
     button.onclick = clickFunc;
     return button;
+}
+
+function addAlarmSetting(div) {
+    div.append('&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; <label style="font-size:14px"><b>日历提醒时间：</b></label>');
+    div.append('                   <input id="lunchAlarm" type="time" class="input-alarm" type="time" value="12:00" required />');
+    div.append('&nbsp;&nbsp;&nbsp; <input id="dinnerAlarm" type="time" class="input-alarm" type="time" value="18:00" required />');
+    var lunchAlarm = $("#lunchAlarm");
+    lunchAlarm.attr("defaultValue", "12:00");
+    lunchAlarm.on("blur", onblurAlarm);
+    var alarmValue = localStorage.getItem("lunchAlarm");
+    if (alarmValue != null) {
+        lunchAlarm.val(alarmValue);
+    }
+    onblurAlarm(lunchAlarm);
+
+    var dinnerAlarm = $("#dinnerAlarm");
+    dinnerAlarm.attr("defaultValue", "18:00");
+    dinnerAlarm.on("blur", onblurAlarm);
+    alarmValue = localStorage.getItem("dinnerAlarm");
+    if (alarmValue != null) {
+        dinnerAlarm.val(alarmValue);
+    }
+    onblurAlarm(dinnerAlarm);
+}
+
+function onblurAlarm(arg) {
+    var warning;
+    var flag = true;
+    if (arg.type == "blur") {
+        select = $(this)[0];
+    } else {
+        select = arg[0];
+    }
+    var id = select.id;
+    var value = select.value;
+    value = Number(value.replace(":", ""));
+
+    if (id == "lunchAlarm" && (value < 1130 || value > 1330)) {
+        flag = false;
+        warning = "午餐提醒时间限制在11:30 - 13:30间";
+    } else if (id == "dinnerAlarm" && (value < 1730 || value > 1930)) {
+        flag = false;
+        warning = "午餐提醒时间限制在17:30 - 19:30间";
+    }
+    if (!flag) {
+        alert(warning);
+        select.value = select.getAttribute("defaultValue");
+        select.focus();
+    }
 }
 
 function setSelectedTag() {
@@ -434,11 +489,15 @@ function createIcsEvent(food) {
             short += regResult[2];
         }
     }
+
+    var lunchAlarm = $("#lunchAlarm").val().split(":");
+    var dinnerAlarm = $("#dinnerAlarm").val().split(":");
+
     if (0 == food.am) {
-        foodTime.setHours(12, 0, 0, 0);
+        foodTime.setHours(lunchAlarm[0], lunchAlarm[1], 0, 0);
         ics_event += "SUMMARY:午-" + short;
     } else {
-        foodTime.setHours(18, 0, 0, 0);
+        foodTime.setHours(dinnerAlarm[0], dinnerAlarm[1], 0, 0);
         ics_event += "SUMMARY:晚-" + short;
     }
 
