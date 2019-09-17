@@ -17,7 +17,7 @@ $('head').append('<style type="text/css">.btn-event {  display: inline-block;  w
 $('head').append('<style type="text/css">.btn-event:hover { background-color: #008FFF; }');
 $('head').append('<style type="text/css">.btn-export { line-height: 40px; }');
 $('head').append('<style type="text/css">.notSelected { font-size: 18px; color: rgba(255,0,0,1); }');
-$('head').append('<style type="text/css">.input-alarm { margin-top: 9px; width:100px;  box-sizing: border-box; border-radius: 3px; border: 1px solid #cbd5de; }');
+$('head').append('<style type="text/css">.input-alarm { margin-top: 9px; width:80px;  box-sizing: border-box; border-radius: 3px; border: 1px solid #cbd5de; }');
 
 window.addEventListener('load', function () {
     if (!checkIsOrderingToInit()) {
@@ -169,6 +169,29 @@ function addOneKeyBtns(position) {
         getSelectedResult();
     });
     position.before(noeat_btn);
+
+    var random_btn = createBtn("一键随机", "btn btn-event", function() {
+        oneKeyRandom();
+        getSelectedResult();
+    });
+    position.before(random_btn);
+}
+
+function oneKeyRandom() {
+    console.log("oneKeyRandom");
+    var useRegex = $("#useRegex").prop("checked");
+    var questions = $(".question-list section");
+    for (const question of questions) {
+        var option_items = question.querySelectorAll(".checkbox-option");
+        var num = Math.floor(Math.random() * (option_items.length-1)) + 1;
+        if (option_items.length > 0) {
+            option_items[num].querySelector("label").click();
+        }
+    }
+    var jumpToSubmit = $("#jumpToSubmit").prop("checked");
+    if (jumpToSubmit) {
+        window.scrollTo(0, document.querySelector(".survey-container").scrollHeight);
+    }
 }
 
 function oneKeySelect(content, title) {
@@ -268,7 +291,7 @@ function addAlarmSetting(div) {
 }
 
 function onblurAlarm(arg) {
-    var warning;
+    var warning, select;
     var flag = true;
     if (arg.type == "blur") {
         select = $(this)[0];
